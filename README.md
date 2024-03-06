@@ -85,6 +85,15 @@ Date: Wed, 06 Mar 2024 02:50:04 GMT
 
 </details>
 
-### init
+## dockerize
+- https://spring.io/guides/topicals/spring-boot-docker
+- only when it's m2 [issues](https://github.com/pySatellite/restdb/issues/3) : --platform linux/amd64 
+```
+$ ./gradlew clean bootJar
+$ docker build --platform linux/amd64 --build-arg JAR_FILE=build/libs/restdb-0.2.0-SNAPSHOT.jar -f docker/Dockerfile -t restdb:0.2.0 .
+$ docker run --platform linux/amd64 -d --name restdb020 -p 8020:8080 restdb:0.2.0
+```
+
+## init
 - https://spring.io/guides/gs/accessing-data-rest
 <img width="1341" alt="image" src="https://github.com/pySatellite/restdb/assets/87309910/9a45696b-399e-4551-aa0b-ec24fc9f82e5">
