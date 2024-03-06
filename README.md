@@ -97,6 +97,7 @@ $ docker run --platform linux/amd64 -d --name restdb020 -p 8020:8080 restdb:0.2.
 ## docker compose
 ```
 $ docker compose -f docker-compose.yml up -d --force-recreate --build
+
 ```
 
 ## init
