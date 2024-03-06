@@ -1,4 +1,4 @@
-package nin.pysatellite.restdb.accessingdatarest;
+package nin.pysatellite.restdb;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -85,6 +85,122 @@ Date: Wed, 06 Mar 2024 02:50:04 GMT
 
 </details>
 
-### init
+## dockerize
+- https://spring.io/guides/topicals/spring-boot-docker
+- only when it's m2 [issues](https://github.com/pySatellite/restdb/issues/3) : --platform linux/amd64 
+```
+$ ./gradlew clean bootJar
+$ docker build --platform linux/amd64 --build-arg JAR_FILE=build/libs/restdb-0.2.0-SNAPSHOT.jar -f docker/Dockerfile -t restdb:0.2.0 .
+$ docker run --platform linux/amd64 -d --name restdb020 -p 8020:8080 restdb:0.2.0
+```
+
+## docker compose
+```
+$ docker compose -f docker-compose.yml up -d --force-recreate --build
+```
+
+## proxy
+```
+$ curl -Iv  http://localhost:8888/people/1
+*   Trying 127.0.0.1:8888...
+* Connected to localhost (127.0.0.1) port 8888 (#0)
+> HEAD /people/1 HTTP/1.1
+> Host: localhost:8888
+> User-Agent: curl/7.84.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+HTTP/1.1 200
+< Server: nginx/1.25.4
+Server: nginx/1.25.4
+< Date: Wed, 06 Mar 2024 11:25:59 GMT
+Date: Wed, 06 Mar 2024 11:25:59 GMT
+< Content-Type: application/hal+json
+Content-Type: application/hal+json
+< Connection: keep-alive
+Connection: keep-alive
+< Vary: Origin
+Vary: Origin
+< Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Method
+< Vary: Access-Control-Request-Headers
+Vary: Access-Control-Request-Headers
+
+<
+* Connection #0 to host localhost left intact
+
+
+$ curl http://localhost:8888/people/1 | jq
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   204    0   204    0     0   3702      0 --:--:-- --:--:-- --:--:--  4000
+{
+  "firstName": "Gil Dong",
+  "lastName": "Hong",
+  "_links": {
+    "self": {
+      "href": "http://rest:8080/people/1"
+    },
+    "person": {
+      "href": "http://rest:8080/people/1"
+    }
+  }
+}
+$ curl http://localhost:8888/people/1 | jq
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   204    0   204    0     0   3634      0 --:--:-- --:--:-- --:--:--  4250
+{
+  "firstName": "Gil Dong",
+  "lastName": "Hong",
+  "_links": {
+    "self": {
+      "href": "http://rest:8080/people/1"
+    },
+    "person": {
+      "href": "http://rest:8080/people/1"
+    }
+  }
+}
+```
+
+## cache
+```
+$ docker exec restdb-proxy-1 tail -n 6 /var/log/nginx/api-proxy.access.log
+172.27.0.1 - - [06/Mar/2024:12:32:11 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=EXPIRED
+172.27.0.1 - - [06/Mar/2024:12:32:12 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+172.27.0.1 - - [06/Mar/2024:12:32:12 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+172.27.0.1 - - [06/Mar/2024:12:32:13 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+172.27.0.1 - - [06/Mar/2024:12:32:14 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+172.27.0.1 - - [06/Mar/2024:12:32:15 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+
+
+$ docker exec restdb-proxy-1 cat /etc/nginx/conf.d/proxy.conf
+proxy_cache_path /etc/nginx/cache levels=1:2 keys_zone=my_cache:10m max_size=100m inactive=1m use_temp_path=off;
+
+log_format cache '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" cs=$upstream_cache_status';
+server {
+    listen 80;
+
+    ## Access and error logs.
+    access_log /var/log/nginx/api-proxy.access.log cache;
+    error_log  /var/log/nginx/api-cache.error.log;
+
+    location / {
+        proxy_pass http://rest:8080;
+
+        # proxy_ignore_headers X-Accel-Expires Expires Cache-Control;
+        proxy_cache_valid 200 302 5s;
+        proxy_cache_valid 404 1m;
+
+        proxy_cache my_cache;
+        # proxy_cache_valid 24h;
+        # proxy_cache_methods GET POST;
+    }
+}%
+```
+
+## init
 - https://spring.io/guides/gs/accessing-data-rest
 <img width="1341" alt="image" src="https://github.com/pySatellite/restdb/assets/87309910/9a45696b-399e-4551-aa0b-ec24fc9f82e5">
