@@ -94,6 +94,11 @@ $ docker build --platform linux/amd64 --build-arg JAR_FILE=build/libs/restdb-0.2
 $ docker run --platform linux/amd64 -d --name restdb020 -p 8020:8080 restdb:0.2.0
 ```
 
+## docker compose
+```
+$ docker compose -f docker-compose.yml up -d --force-recreate --build
+```
+
 ## init
 - https://spring.io/guides/gs/accessing-data-rest
 <img width="1341" alt="image" src="https://github.com/pySatellite/restdb/assets/87309910/9a45696b-399e-4551-aa0b-ec24fc9f82e5">

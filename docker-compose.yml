@@ -1,0 +1,21 @@
+name: restdb
+services:
+  rest:
+    build: .
+    ports:
+      - 7777:8080
+    platform: linux/amd64
+    depends_on:
+      - db
+    links:
+      - db
+
+  db:
+    image: mariadb:10.5.24-focal
+    ports: 
+      - 33306:3306
+    environment:
+      MARIADB_ROOT_PASSWORD: my_root_password
+      MARIADB_USER: my_user
+      MARIADB_PASSWORD: my_password
+      MARIADB_DATABASE: my_database
