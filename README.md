@@ -97,7 +97,72 @@ $ docker run --platform linux/amd64 -d --name restdb020 -p 8020:8080 restdb:0.2.
 ## docker compose
 ```
 $ docker compose -f docker-compose.yml up -d --force-recreate --build
+```
 
+## proxy
+```
+$ curl -Iv  http://localhost:8888/people/1
+*   Trying 127.0.0.1:8888...
+* Connected to localhost (127.0.0.1) port 8888 (#0)
+> HEAD /people/1 HTTP/1.1
+> Host: localhost:8888
+> User-Agent: curl/7.84.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+HTTP/1.1 200
+< Server: nginx/1.25.4
+Server: nginx/1.25.4
+< Date: Wed, 06 Mar 2024 11:25:59 GMT
+Date: Wed, 06 Mar 2024 11:25:59 GMT
+< Content-Type: application/hal+json
+Content-Type: application/hal+json
+< Connection: keep-alive
+Connection: keep-alive
+< Vary: Origin
+Vary: Origin
+< Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Method
+< Vary: Access-Control-Request-Headers
+Vary: Access-Control-Request-Headers
+
+<
+* Connection #0 to host localhost left intact
+
+
+$ curl http://localhost:8888/people/1 | jq
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   204    0   204    0     0   3702      0 --:--:-- --:--:-- --:--:--  4000
+{
+  "firstName": "Gil Dong",
+  "lastName": "Hong",
+  "_links": {
+    "self": {
+      "href": "http://rest:8080/people/1"
+    },
+    "person": {
+      "href": "http://rest:8080/people/1"
+    }
+  }
+}
+$ curl http://localhost:8888/people/1 | jq
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   204    0   204    0     0   3634      0 --:--:-- --:--:-- --:--:--  4250
+{
+  "firstName": "Gil Dong",
+  "lastName": "Hong",
+  "_links": {
+    "self": {
+      "href": "http://rest:8080/people/1"
+    },
+    "person": {
+      "href": "http://rest:8080/people/1"
+    }
+  }
+}
 ```
 
 ## init
