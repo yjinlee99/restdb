@@ -165,6 +165,42 @@ $ curl http://localhost:8888/people/1 | jq
 }
 ```
 
+## cache
+```
+$ docker exec restdb-proxy-1 tail -n 6 /var/log/nginx/api-proxy.access.log
+172.27.0.1 - - [06/Mar/2024:12:32:11 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=EXPIRED
+172.27.0.1 - - [06/Mar/2024:12:32:12 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+172.27.0.1 - - [06/Mar/2024:12:32:12 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+172.27.0.1 - - [06/Mar/2024:12:32:13 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+172.27.0.1 - - [06/Mar/2024:12:32:14 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+172.27.0.1 - - [06/Mar/2024:12:32:15 +0000] "HEAD /people/1 HTTP/1.1" 200 0 "-" "curl/7.84.0" cs=HIT
+
+
+$ docker exec restdb-proxy-1 cat /etc/nginx/conf.d/proxy.conf
+proxy_cache_path /etc/nginx/cache levels=1:2 keys_zone=my_cache:10m max_size=100m inactive=1m use_temp_path=off;
+
+log_format cache '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" cs=$upstream_cache_status';
+server {
+    listen 80;
+
+    ## Access and error logs.
+    access_log /var/log/nginx/api-proxy.access.log cache;
+    error_log  /var/log/nginx/api-cache.error.log;
+
+    location / {
+        proxy_pass http://rest:8080;
+
+        # proxy_ignore_headers X-Accel-Expires Expires Cache-Control;
+        proxy_cache_valid 200 302 5s;
+        proxy_cache_valid 404 1m;
+
+        proxy_cache my_cache;
+        # proxy_cache_valid 24h;
+        # proxy_cache_methods GET POST;
+    }
+}%
+```
+
 ## init
 - https://spring.io/guides/gs/accessing-data-rest
 <img width="1341" alt="image" src="https://github.com/pySatellite/restdb/assets/87309910/9a45696b-399e-4551-aa0b-ec24fc9f82e5">
