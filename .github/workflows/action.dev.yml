@@ -1,4 +1,4 @@
-name: Deploy2aws🚀🚀
+name: Deploy2aws 🚀
 
 on:
   push:
@@ -7,13 +7,6 @@ on:
   pull_request:
     types:
       - closed
-
-# 변수 설정
-env:
-  AWS_REGION: ${{ env.AWS_REGION }}
-  S3_BUCKET_NAME: ${{ env.S3_BUCKET_NAME }}
-  CODE_DEPLOY_APP_NAME: ${{ env.CODE_DEPLOY_APP_NAME }}
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }}
 
 jobs:
   deploy:
@@ -38,7 +31,7 @@ jobs:
           aws deploy push \
             --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --ignore-hidden-files \
-            --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+            --s3-location s3://${{ env.S3_BUCKET_NAME }}/$GITHUB_SHA.zip \
             --source .
 
       # S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
@@ -48,4 +41,4 @@ jobs:
             --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-            --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+            --s3-location bucket=${{ env.S3_BUCKET_NAME }},key=$GITHUB_SHA.zip,bundleType=zip
