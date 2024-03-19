@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 
-docker compose -f docker-compose.yml up -d
+cd /home/ubuntu/app/restdb
+
+./gradlew bootRun
+
+sudo docker compose -f docker-compose.yml up -d
