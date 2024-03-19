@@ -212,3 +212,4 @@ server {
 - [AppSpec 파일 구조](https://docs.aws.amazon.com/ko_kr/codedeploy/latest/userguide/reference-appspec-file-structure.html)
 - [AppSpec 권한 섹션](https://docs.aws.amazon.com/ko_kr/codedeploy/latest/userguide/reference-appspec-file-structure-permissions.html)
 - [CodeDeploy agent was not able to receive the lifecycle event. Check the CodeDeploy agent logs on your host and make sure the agent is running and can connect to the CodeDeploy server](https://stackoverflow.com/questions/73861102/before-install-codedeploy-agent-was-not-able-to-receive-the-lifecycle-event-ch)
+- [CodeDeploy agent was not able to receive the lifecycle event. Check the CodeDeploy agent logs on your host and make sure the agent is running and can connect to the CodeDeploy server](https://ssue-dev.tistory.com/entry/AWS-CodeDeploy-%EB%B0%B0%ED%8F%AC%EC%8B%9C-%EB%82%98%EB%8A%94-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0%EB%B2%95)
